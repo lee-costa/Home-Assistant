@@ -1,0 +1,181 @@
+#  _
+# | |__   __ _ ___ ___
+# | '_ \ / _` / __/ __|
+# | | | | (_| \__ \__ \
+# |_| |_|\__,_|___/___/
+#
+
+#################################################################
+## Home Assistant
+#################################################################
+
+homeassistant:
+  name: "Home"
+  latitude: !secret lat
+  longitude: !secret long
+  elevation: 48
+  unit_system: imperial
+  time_zone: America/New_York
+  customize: !include customize.yaml
+
+#################################################################
+## Includes
+#################################################################
+
+automation split: !include_dir_merge_list automation
+automation: !include automations.yaml
+script split: !include_dir_merge_named scripts
+script: !include scripts.yaml
+switch: !include switches.yaml
+light: !include light.yaml
+sensor: !include sensors.yaml
+binary_sensor: !include binary_sensor.yaml
+camera: !include camera.yaml
+input_boolean: !include input_boolean.yaml
+input_select: !include input_select.yaml
+group: !include groups.yaml
+scene: !include scenes.yaml
+# zone: !include zones.yaml
+# media_player: !include media_player.yaml
+alarm_control_panel: !include alarm.yaml
+# history_graph: !include history_graph.yaml Deprecated
+# ios: !include push_ios.yaml
+homekit: !include homekit.yaml
+panel_custom: !include panel_custom.yaml
+# customize: !include customize.yaml #It's above
+
+frontend:
+  themes: !include_dir_merge_named themes/
+
+config:
+
+zeroconf:
+
+#################################################################
+## Components
+#################################################################
+
+ffmpeg:
+
+person:
+
+mobile_app:
+
+# discovery:
+
+discovery:
+  ignore:
+    - sabnzbd
+
+system_health:
+
+conversation:
+
+recorder:
+  # purge_interval: 2 #Deprecated in 109
+  db_url: mysql://homeassistant:REDACTED@localhost/homeassistant?charset=utf8mb4
+  purge_keep_days: 5
+  exclude:
+    domains:
+      - weblink
+      - updater
+      # - sensor
+      # - binary_sensor
+      - zone
+      - sun
+      - camera
+      - media_player
+      - switch
+      - calendar
+      - frontend
+    entity_globs:
+      - sensor.weather_*
+    entities:
+      - sensor.date
+      - sun.sun
+
+history:
+  exclude:
+    entities:
+     - sensor.date
+     - sensor.time
+
+logbook:
+  exclude:
+    entities:
+      - sensor.date
+    domains:
+      - sun
+      - weblink
+sun:
+
+tts:
+  - platform: google_translate
+    service_name: google_say
+
+nest:
+  client_id: REDACTED
+  client_secret: !secret nest_api_secret
+
+notify:
+  - name: gmail
+    platform: smtp
+    server: smtp.gmail.com
+    port: 587
+    timeout: 15
+    sender: REDACTED
+    encryption: starttls
+    username: REDACTED
+    password: !secret gmail_secret
+    recipient:
+      - REDACTED
+      - REDACTED
+    sender_name: Alarm Panel
+  - name: iOS
+    platform: group
+    services:
+      - service: mobile_app_REDACTED
+      - service: mobile_app_REDACTED
+
+  - name: Nofity_HA_Bot
+    platform: telegram
+    chat_id: REDACTED
+
+telegram_bot:
+  - platform: broadcast
+    api_key: !secret telegram_api
+    allowed_chat_ids:
+      - REDACTED
+
+influxdb:
+  host: 192.168.139.20
+  database: homeassistant
+  username: REDACTED
+  password: REDACTED
+  include:
+    entities:
+     - sensor.living_room_temperature
+     - sensor.openweathermap_temperature
+     - sensor.hallway_thermostat_temperature
+     - sensor.basement_temperature
+     - sensor.basement_humidity
+     - sensor.hallway_thermostat_humidity
+     - sensor.living_room_humidity
+     - sensor.openweathermap_humidity
+     - sensor.basement_door_battery_level_2
+     - sensor.bedroom_motion_battery_level
+     - sensor.deck_window_battery_level_2
+     - sensor.dining_room_motion_battery_level_3
+     - sensor.front_door_lock_battery_level
+     - sensor.hallway_door_windows_sensor_battery_level
+     - sensor.kitchen_deadbolt_battery_level_2
+     - sensor.kitchen_motion_battery_level_2
+     - sensor.kitchen_window_battery_level_3
+     - sensor.living_room_motion_battery_level_2
+     - sensor.mia_motion_sensor_battery_level
+     - sensor.office_motion_detector_battery_level
+     - sensor.back_door_battery_level
+     - sensor.office_aqara_temperature
+  tags:
+    instance: home
+    source: hass
